@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nutriólogo Diego Rodea — Evaluación Antropométrica y Nivel Atlético</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&display=swap" rel="stylesheet" />
+  <!-- Librería jsPDF para generar el informe PDF descargable listo para WhatsApp -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <!-- ENCABEZADO / HERO DE BIENVENIDA -->
+  <header class="hero-header">
+    <div class="container hero-inner">
+      <div class="logo-showcase">
+        <div class="logo-glow"></div>
+        <img src="logo.png" alt="Logo Nutriólogo Diego Rodea" class="brand-logo" id="brandLogoImg" />
+      </div>
+      <div class="hero-copy">
+        <span class="welcome-pill">SISTEMA CLÍNICO Y DEPORTIVO DE ALTO RENDIMIENTO</span>
+        <h1>Te da la bienvenida tu <span>Nutriólogo Diego Rodea</span></h1>
+        <p class="hero-subtitle">
+          Evaluación antropométrica de precisión, cálculo científico de grasa corporal, análisis de FFMI, nivel real de gimnasio y diagnóstico de puntos fuertes y débiles.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container app-layout">
+    <!-- BARRA DE PERFIL DE USUARIO EN LA NUBE -->
+    <section class="card profile-bar-card">
+      <div class="profile-bar-top">
+        <div class="profile-bar-title">
+          <span class="profile-badge-icon">👤</span>
+          <div>
+            <h2>Perfil de Paciente en la Nube</h2>
+            <p>Crea tu perfil o carga uno existente para recuperar tus medidas y llevar tu progreso con el Nutriólogo Diego Rodea.</p>
+          </div>
+        </div>
+        <div class="cloud-status-pill" id="cloudSyncIndicator">
+          <span class="pulse-dot"></span> Nube Lista
+        </div>
+      </div>
+
+      <div class="profile-controls-grid">
+        <div class="field-box">
+          <label for="profileSelect">Cargar perfil guardado</label>
+          <select id="profileSelect">
+            <option value="">-- Nuevo Perfil de Usuario --</option>
+          </select>
+        </div>
+
+        <div class="field-box">
+          <label for="profileCloudCode">ID / Código de Nube (opcional para otro dispositivo)</label>
+          <div class="inline-code-group">
+            <input type="text" id="profileCloudCode" placeholder="Ej. DR-84920" />
+            <button type="button" class="btn-mini-red" id="btnLoadCloudCode" title="Recuperar perfil desde la nube con tu código">Cargar</button>
+          </div>
+        </div>
+
+        <div class="field-box profile-quick-actions">
+          <label>Acción rápida</label>
+          <div class="inline-code-group">
+            <button type="button" class="btn-mini-outline" id="btnNewProfile">+ Limpiar / Nuevo Perfil</button>
+            <button type="button" class="btn-mini-red" id="btnQuickSaveTop">☁️ Guardar Perfil</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 1: DATOS PERSONALES Y ANTROPOMETRÍA CON DIBUJOS -->
+    <section class="card section-card">
+      <div class="section-title-bar">
+        <div class="step-badge">PASO 1</div>
+        <div>
+          <h2>Datos del Paciente y Perímetros Corporales</h2>
+          <p>Ingresa tu nombre, estatura en metros, peso en kilos, edad y mide cada zona guiándote con los dibujos anatómicos.</p>
+        </div>
+      </div>
+
+      <!-- Datos Básicos -->
+      <div class="basic-data-grid">
+        <div class="field-box field-wide">
+          <label for="patientName">Nombre completo (Usuario / Paciente)</label>
+          <input type="text" id="patientName" placeholder="Escribe tu nombre y apellido..." value="" />
+        </div>
+
+        <div class="field-box">
+          <label for="patientPin">PIN o Correo de tu Perfil</label>
+          <input type="text" id="patientPin" placeholder="Ej. 1234 o correo@..." value="" />
+        </div>
+
+        <div class="field-box">
+          <label>Sexo biológico</label>
+          <div class="sex-toggle" role="radiogroup" aria-label="Sexo biológico">
+            <button type="button" class="sex-option active" data-sex="male" id="btnSexMale">Hombre</button>
+            <button type="button" class="sex-option" data-sex="female" id="btnSexFemale">Mujer</button>
+          </div>
+        </div>
+
+        <div class="field-box">
+          <label for="patientAge">Edad</label>
+          <div class="input-unit-wrap">
+            <input type="number" id="patientAge" min="12" max="95" step="1" value="26" />
+            <span class="unit-badge">años</span>
+          </div>
+        </div>
+
+        <div class="field-box">
+          <label for="patientHeight">Estatura (en metros)</label>
+          <div class="input-unit-wrap">
+            <input type="number" id="patientHeight" min="1.20" max="2.30" step="0.01" value="1.75" placeholder="Ej. 1.75" />
+            <span class="unit-badge">m</span>
+          </div>
+          <small class="input-hint" id="heightHint">En metros (ej. 1.75 m)</small>
+        </div>
+
+        <div class="field-box">
+          <label for="patientWeight">Peso corporal</label>
+          <div class="input-unit-wrap">
+            <input type="number" id="patientWeight" min="30" max="250" step="0.1" value="78.0" />
+            <span class="unit-badge">kg</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider" />
+
+      <!-- Guía Visual de Medidas Antropométricas (Tarjetas con Dibujo de cada medida) -->
+      <h3 class="subsection-heading">
+        <span>📏 Medidas con Cinta Métrica (en centímetros)</span>
+        <small>Guíate con la línea roja de cada dibujo para colocar la cinta exactamente en el punto anatómico correcto</small>
+      </h3>
+
+      <div class="measurements-cards-grid">
+        <!-- 1. CUELLO -->
+        <div class="measure-card">
+          <div class="measure-drawing">
+            <svg viewBox="0 0 120 120" class="anat-svg" aria-label="Cómo medir el cuello">
+              <path d="M40 20 C40 8, 80 8, 80 20 L80 42 C80 52, 70 58, 60 58 C50 58, 40 52, 40 42 Z" fill="#18181c" stroke="#ffffff" stroke-width="2"/>
+              <path d="M47 55 L45 85 L20 98 L20 112 L100 112 L100 98 L75 85 L73 55" fill="#121216" stroke="#ffffff" stroke-width="2"/>
+              <path d="M45 69 Q60 74 75 69" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+              <path d="M45 69 Q60 65 75 69" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+              <circle cx="60" cy="71" r="3" fill="#ffffff"/>
+              <text x="60" y="106" text-anchor="middle" fill="#e4e4e7" font-size="8.5" font-weight="700">DEBAJO DE LARINGE</text>
+            </svg>
+          </div>
+          <div class="measure-content">
+            <label for="mNeck">1. Medida del Cuello</label>
+            <p class="measure-tip">Coloca la cinta justo debajo de la nuez de Adán (laringe), mirando al frente y con los hombros relajados.</p>
+            <div class="input-unit-wrap">
+              <input type="number" id="mNeck" min="24" max="65" step="0.1" value="39.0" />
+              <span class="unit-badge">cm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. CINTURA -->
+        <div class="measure-card">
+          <div class="measure-drawing">
+            <svg viewBox="0 0 120 120" class="anat-svg" aria-label="Cómo medir la cintura">
+              <path d="M30 18 L90 18 L82 65 L86 102 L34 102 L38 65 Z" fill="#121216" stroke="#ffffff" stroke-width="2"/>
+              <path d="M36 38 Q48 44 60 38 Q72 44 84 38" fill="none" stroke="#71717a" stroke-width="1.5"/>
+              <line x1="60" y1="38" x2="60" y2="85" stroke="#71717a" stroke-width="1.2"/>
+              <circle cx="60" cy="68" r="2.2" fill="#ffffff"/>
+              <path d="M37 66 Q60 72 83 66" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+              <path d="M37 66 Q60 61 83 66" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+              <text x="60" y="114" text-anchor="middle" fill="#e4e4e7" font-size="8.5" font-weight="700">RODEAR AL OMBLIGO</text>
+            </svg>
+          </div>
+          <div class="measure-content">
+            <label for="mWaist">2. Medida de Cintura</label>
+            <p class="measure-tip">Rodea el abdomen a nivel del ombligo (o parte más estrecha del torso) tras soltar el aire normalmente.</p>
+            <div class="input-unit-wrap">
+              <input type="number" id="mWaist" min="45" max="190" step="0.1" value="82.0" />
+              <span class="unit-badge">cm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CADERA -->
+        <div class="measure-card">
+          <div class="measure-drawing">
+            <svg viewBox="0 0 120 120" class="anat-svg" aria-label="Cómo medir la cadera">
+              <path d="M38 18 L82 18 L92 58 L84 102 L63 102 L60 72 L57 102 L36 102 L28 58 Z" fill="#121216" stroke="#ffffff" stroke-width="2"/>
+              <path d="M29 58 Q60 65 91 58" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+              <path d="M29 58 Q60 52 91 58" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+              <circle cx="60" cy="61" r="3" fill="#ffffff"/>
+              <text x="60" y="114" text-anchor="middle" fill="#e4e4e7" font-size="8.5" font-weight="700">ZONA MÁS ANCHA GLÚTEOS</text>
+            </svg>
+          </div>
+          <div class="measure-content">
+            <label for="mHip">3. Medida de Cadera</label>
+            <p class="measure-tip">Con los pies juntos, pasa la cinta completamente horizontal por la parte más prominente de los glúteos.</p>
+            <div class="input-unit-wrap">
+              <input type="number" id="mHip" min="55" max="190" step="0.1" value="97.0" />
+              <span class="unit-badge">cm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. PANTORRILLA -->
+        <div class="measure-card">
+          <div class="measure-drawing">
+            <svg viewBox="0 0 120 120" class="anat-svg" aria-label="Cómo medir la pantorrilla">
+              <path d="M46 14 L74 14 L72 30 C80 45, 78 65, 68 82 L66 98 L48 98 L50 82 C42 65, 40 45, 48 30 Z" fill="#121216" stroke="#ffffff" stroke-width="2"/>
+              <path d="M48 32 Q60 36 72 32" fill="none" stroke="#71717a" stroke-width="1.5"/>
+              <path d="M42 50 Q60 55 77 50" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+              <path d="M42 50 Q60 45 77 50" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+              <circle cx="60" cy="52" r="3" fill="#ffffff"/>
+              <text x="60" y="112" text-anchor="middle" fill="#e4e4e7" font-size="8.5" font-weight="700">MÁXIMO DEL GEMELO</text>
+            </svg>
+          </div>
+          <div class="measure-content">
+            <label for="mCalf">4. Medida de Pantorrilla</label>
+            <p class="measure-tip">De pie apoyando el peso en ambas piernas, mide el contorno más ancho de la pantorrilla (gemelo).</p>
+            <div class="input-unit-wrap">
+              <input type="number" id="mCalf" min="20" max="65" step="0.1" value="38.5" />
+              <span class="unit-badge">cm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. MUSLO MEDIO -->
+        <div class="measure-card">
+          <div class="measure-drawing">
+            <svg viewBox="0 0 120 120" class="anat-svg" aria-label="Cómo medir el muslo medio">
+              <path d="M36 16 L84 16 L76 86 L72 100 L48 100 L44 86 Z" fill="#121216" stroke="#ffffff" stroke-width="2"/>
+              <line x1="25" y1="20" x2="25" y2="86" stroke="#a1a1aa" stroke-width="1.5" stroke-dasharray="2 2"/>
+              <circle cx="25" cy="53" r="3" fill="#ef4444"/>
+              <ellipse cx="60" cy="90" rx="10" ry="6" fill="none" stroke="#71717a" stroke-width="1.5"/>
+              <path d="M40 53 Q60 58 80 53" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+              <path d="M40 53 Q60 48 80 53" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+              <circle cx="60" cy="55" r="3" fill="#ffffff"/>
+              <text x="60" y="113" text-anchor="middle" fill="#e4e4e7" font-size="8.5" font-weight="700">MITAD INGLE A RODILLA</text>
+            </svg>
+          </div>
+          <div class="measure-content">
+            <label for="mThigh">5. Medida de Muslo Medio</label>
+            <p class="measure-tip">De pie con la pierna relajada, mide justo a la mitad entre el pliegue de la ingle y el borde superior de la rodilla.</p>
+            <div class="input-unit-wrap">
+              <input type="number" id="mThigh" min="30" max="95" step="0.1" value="58.0" />
+              <span class="unit-badge">cm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. BÍCEPS CONTRAÍDO -->
+        <div class="measure-card">
+          <div class="measure-drawing">
+            <svg viewBox="0 0 120 120" class="anat-svg" aria-label="Cómo medir el bíceps contraído">
+              <path d="M18 75 L42 75 C46 54, 66 52, 74 68 L82 40 L96 42 L88 86 C86 94, 78 96, 68 95 L18 95 Z" fill="#121216" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="89" cy="34" r="8" fill="#121216" stroke="#ffffff" stroke-width="2"/>
+              <path d="M58 56 Q62 76 58 95" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+              <path d="M58 56 Q54 76 58 95" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+              <circle cx="58" cy="75" r="3" fill="#ffffff"/>
+              <text x="60" y="113" text-anchor="middle" fill="#e4e4e7" font-size="8.5" font-weight="700">BRAZO 90° APRETANDO</text>
+            </svg>
+          </div>
+          <div class="measure-content">
+            <label for="mBiceps">6. Bíceps Contraído</label>
+            <p class="measure-tip">Flexiona el codo a 90°, aprieta el puño y contrae el bíceps al máximo. Mide sobre el punto más alto del músculo.</p>
+            <div class="input-unit-wrap">
+              <input type="number" id="mBiceps" min="18" max="65" step="0.1" value="38.0" />
+              <span class="unit-badge">cm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: DATOS DE FUERZA Y GYM (OPCIONALES / FLEXIBLES) -->
+    <section class="card section-card">
+      <div class="section-title-bar">
+        <div class="step-badge">PASO 2</div>
+        <div>
+          <h2>Valoración de Nivel de Gym y Rendimiento</h2>
+          <p>Coloca tus marcas en los ejercicios que realices. Si algún ejercicio no aplica o no lo haces, puedes dejarlo en blanco o en 0 y se te evaluará con los que pongas.</p>
+        </div>
+      </div>
+
+      <!-- Calculadora auxiliar rápida de 1RM -->
+      <div class="rm-helper-box">
+        <div class="rm-helper-title">
+          <span>🔥 Calculadora rápida de 1RM (si no sabes tu peso máximo a 1 repetición):</span>
+        </div>
+        <div class="rm-helper-controls">
+          <input type="number" id="calcRmWeight" placeholder="Peso levantado (kg)" min="1" max="500" step="0.5" />
+          <span>×</span>
+          <input type="number" id="calcRmReps" placeholder="Repeticiones (1-15)" min="1" max="20" step="1" />
+          <span class="rm-helper-result" id="calcRmResult">= Tu 1RM estimado: <strong>— kg</strong></span>
+        </div>
+      </div>
+
+      <div class="gym-inputs-grid">
+        <div class="gym-card">
+          <div class="gym-card-head">
+            <span class="gym-icon">🏋️</span>
+            <div>
+              <label for="liftSquat">Sentadilla (Squat) — 1RM</label>
+              <small>Repetición máxima en kilos</small>
+            </div>
+          </div>
+          <div class="input-unit-wrap">
+            <input type="number" id="liftSquat" min="0" max="450" step="1" value="115" placeholder="Si aplica (kg)" />
+            <span class="unit-badge">kg</span>
+          </div>
+          <div class="individual-level-pill" id="pillSquat">Nivel: —</div>
+        </div>
+
+        <div class="gym-card">
+          <div class="gym-card-head">
+            <span class="gym-icon">🛡️</span>
+            <div>
+              <label for="liftBench">Press de Banca — 1RM</label>
+              <small>Repetición máxima en kilos</small>
+            </div>
+          </div>
+          <div class="input-unit-wrap">
+            <input type="number" id="liftBench" min="0" max="350" step="1" value="85" placeholder="Si aplica (kg)" />
+            <span class="unit-badge">kg</span>
+          </div>
+          <div class="individual-level-pill" id="pillBench">Nivel: —</div>
+        </div>
+
+        <div class="gym-card">
+          <div class="gym-card-head">
+            <span class="gym-icon">⚡</span>
+            <div>
+              <label for="liftDeadlift">Peso Muerto — 1RM</label>
+              <small>Repetición máxima en kilos</small>
+            </div>
+          </div>
+          <div class="input-unit-wrap">
+            <input type="number" id="liftDeadlift" min="0" max="500" step="1" value="145" placeholder="Si aplica (kg)" />
+            <span class="unit-badge">kg</span>
+          </div>
+          <div class="individual-level-pill" id="pillDeadlift">Nivel: —</div>
+        </div>
+
+        <div class="gym-card">
+          <div class="gym-card-head">
+            <span class="gym-icon">💪</span>
+            <div>
+              <label for="repsPullups">Dominadas (Pull-ups)</label>
+              <small>Máximo de repeticiones (si aplica)</small>
+            </div>
+          </div>
+          <div class="input-unit-wrap">
+            <input type="number" id="repsPullups" min="0" max="100" step="1" value="10" placeholder="Si aplica (reps)" />
+            <span class="unit-badge">reps</span>
+          </div>
+          <div class="individual-level-pill" id="pillPullups">Nivel: —</div>
+        </div>
+
+        <div class="gym-card">
+          <div class="gym-card-head">
+            <span class="gym-icon">🔱</span>
+            <div>
+              <label for="repsDips">Fondos (Dips)</label>
+              <small>Máximo de repeticiones (si aplica)</small>
+            </div>
+          </div>
+          <div class="input-unit-wrap">
+            <input type="number" id="repsDips" min="0" max="150" step="1" value="14" placeholder="Si aplica (reps)" />
+            <span class="unit-badge">reps</span>
+          </div>
+          <div class="individual-level-pill" id="pillDips">Nivel: —</div>
+        </div>
+
+        <div class="gym-card">
+          <div class="gym-card-head">
+            <span class="gym-icon">💥</span>
+            <div>
+              <label for="repsPushups">Lagartijas (Flexiones)</label>
+              <small>Máximo de repeticiones (si aplica)</small>
+            </div>
+          </div>
+          <div class="input-unit-wrap">
+            <input type="number" id="repsPushups" min="0" max="300" step="1" value="32" placeholder="Si aplica (reps)" />
+            <span class="unit-badge">reps</span>
+          </div>
+          <div class="individual-level-pill" id="pillPushups">Nivel: —</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: DIAGNÓSTICO COMPLETO, GRÁFICAS, NIVEL TOTAL Y DESCARGA DE INFORME -->
+    <section class="card section-card results-showcase" id="reportSection">
+      <div class="section-title-bar">
+        <div class="step-badge">DIAGNÓSTICO</div>
+        <div>
+          <h2>Resultados Antropométricos, FFMI y Nivel Total</h2>
+          <p>Informe clínico-deportivo personalizado · <strong>Nutriólogo Diego Rodea</strong></p>
+        </div>
+      </div>
+
+      <!-- PROMEDIO DE GRASA CORPORAL Y FÓRMULAS -->
+      <div class="bf-dashboard-grid">
+        <div class="bf-main-box">
+          <span class="box-kicker">PROMEDIO EXACTITUD CIENTÍFICA (% GRASA)</span>
+          <div class="bf-big-score">
+            <span id="avgBfValue">15.8</span><small>%</small>
+          </div>
+          <div class="bf-category-tag" id="bfCategoryBadge">Categoría: Fitness / Atlético</div>
+          <div class="mass-split-row">
+            <div class="mass-pill">
+              <span>Masa Grasa Total</span>
+              <strong id="outFatMassKg">12.3 kg</strong>
+            </div>
+            <div class="mass-pill">
+              <span>Masa Libre de Grasa (Magra)</span>
+              <strong id="outLeanMassKg">65.7 kg</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="bf-formulas-box">
+          <h3>Fórmulas de Grasa Corporal Analizadas</h3>
+          <p class="formulas-sub">Cálculo simultáneo con las ecuaciones antropométricas de mayor validez clínica y su promedio:</p>
+          <div class="formulas-list">
+            <div class="formula-row">
+              <div>
+                <strong>1. Fórmula U.S. Navy (Marina de EE. UU.)</strong>
+                <small>Hodgdon & Beckett (Estatura, Cuello, Cintura y Cadera)</small>
+              </div>
+              <span class="formula-val" id="valNavyBf">15.4%</span>
+            </div>
+            <div class="formula-row">
+              <div>
+                <strong>2. Fórmula YMCA Modificada</strong>
+                <small>Ecuación de Perímetro Abdominal y Masa Corporal</small>
+              </div>
+              <span class="formula-val" id="valYmcaBf">16.1%</span>
+            </div>
+            <div class="formula-row">
+              <div>
+                <strong>3. Fórmula RFM (Relative Fat Mass — Cedars-Sinai)</strong>
+                <small>Woolcott & Bergman (Relación Estatura / Cintura validada con DXA)</small>
+              </div>
+              <span class="formula-val" id="valRfmBf">15.3%</span>
+            </div>
+            <div class="formula-row">
+              <div>
+                <strong>4. Fórmula CUN-BAE (Clínica Univ. de Navarra)</strong>
+                <small>Estimador Polinómico de Adiposidad por IMC, Edad y Sexo</small>
+              </div>
+              <span class="formula-val" id="valCunbaeBf">16.5%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRÁFICA DE VALORACIÓN DE FFMI -->
+      <div class="ffmi-section-box">
+        <div class="ffmi-header">
+          <div>
+            <h3>📊 Gráfica de Valoración de FFMI (Índice de Masa Libre de Grasa)</h3>
+            <p>Evalúa tu desarrollo muscular real por metro cuadrado de estatura (descontando toda la grasa corporal).</p>
+          </div>
+          <div class="ffmi-badges">
+            <div class="ffmi-stat-chip">
+              <span>FFMI Real</span>
+              <strong id="outFfmi">21.5</strong>
+            </div>
+            <div class="ffmi-stat-chip red-chip">
+              <span>FFMI Ajustado (1.80m)</span>
+              <strong id="outFfmiNorm">21.8</strong>
+            </div>
+            <div class="ffmi-stat-chip">
+              <span>Rango Muscular</span>
+              <strong id="outFfmiLevel">Intermedio</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="ffmiChartCanvas" width="920" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- NIVEL TOTAL (FFMI + NIVEL GYM) Y TIEMPO APROXIMADO PARA PASAR AL SIGUIENTE NIVEL -->
+      <div class="total-level-banner">
+        <div class="level-columns">
+          <div class="level-col">
+            <span class="level-col-label">NIVEL POR FFMI (MÚSCULO)</span>
+            <strong class="level-col-val" id="summaryFfmiTier">INTERMEDIO</strong>
+            <small id="summaryFfmiScore">Score FFMI: 62 / 100</small>
+          </div>
+          <div class="level-plus">+</div>
+          <div class="level-col">
+            <span class="level-col-label">NIVEL DE GYM (FUERZA)</span>
+            <strong class="level-col-val" id="summaryGymTier">INTERMEDIO</strong>
+            <small id="summaryGymScore">Score Fuerza: 58 / 100</small>
+          </div>
+          <div class="level-equals">=</div>
+          <div class="level-col total-col">
+            <span class="level-col-label">NIVEL TOTAL DEL ATLETA</span>
+            <strong class="level-total-Rank" id="summaryTotalTier">INTERMEDIO</strong>
+            <small id="summaryTotalScore">Score Global: 60 / 100</small>
+          </div>
+        </div>
+
+        <!-- Barra de Progreso de los 4 Niveles: Principiante, Intermedio, Avanzado, Élite -->
+        <div class="tier-steps-track">
+          <div class="tier-step" id="tierNodePrincipiante">1. PRINCIPIANTE</div>
+          <div class="tier-step" id="tierNodeIntermedio">2. INTERMEDIO</div>
+          <div class="tier-step" id="tierNodeAvanzado">3. AVANZADO</div>
+          <div class="tier-step" id="tierNodeElite">4. ÉLITE</div>
+        </div>
+
+        <!-- Tiempo Aproximado para Pasar al Siguiente Nivel -->
+        <div class="next-level-roadmap">
+          <div class="roadmap-icon">⏳</div>
+          <div class="roadmap-details">
+            <h4>Tiempo aproximado para pasar al siguiente nivel (<span id="nextLevelName">AVANZADO</span>): <span class="red-highlight" id="nextLevelTime">6 a 9 meses</span></h4>
+            <p id="nextLevelRequirements">
+              Calculando metas de masa magra y progresión de fuerza...
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRÁFICAS DE PUNTOS FUERTES Y DÉBILES (ANTROPOMÉTRICOS Y MOVIMIENTOS) -->
+      <div class="charts-dual-grid">
+        <!-- Gráfica 1: Puntos Antropométricos Fuertes y Débiles -->
+        <div class="chart-panel">
+          <h3>📐 Gráfica de Puntos Antropométricos Fuertes y Débiles</h3>
+          <p class="chart-desc">Porcentaje de desarrollo de cada perímetro respecto al canon atlético ideal para tu estatura (<span id="idealHeightRef">1.75 m</span>):</p>
+          <div class="canvas-wrapper">
+            <canvas id="anthroChartCanvas" width="520" height="330"></canvas>
+          </div>
+          <div class="strengths-weaknesses-summary">
+            <div class="sw-box sw-strong">
+              <span>🔥 Puntos Antropométricos Fuertes</span>
+              <strong id="anthroStrongText">—</strong>
+            </div>
+            <div class="sw-box sw-weak">
+              <span>🎯 Puntos Antropométricos Débiles (Priorizar)</span>
+              <strong id="anthroWeakText">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfica 2: Movimientos Fuertes y Débiles -->
+        <div class="chart-panel">
+          <h3>🏋️ Gráfica de Movimientos Fuertes y Débiles</h3>
+          <p class="chart-desc">Rendimiento relativo en cada ejercicio ingresado (Sentadilla, Banca, Peso Muerto y Calistenia):</p>
+          <div class="canvas-wrapper">
+            <canvas id="movementsChartCanvas" width="520" height="330"></canvas>
+          </div>
+          <div class="strengths-weaknesses-summary">
+            <div class="sw-box sw-strong">
+              <span>🏆 Movimiento Más Fuerte</span>
+              <strong id="moveStrongText">—</strong>
+            </div>
+            <div class="sw-box sw-weak">
+              <span>⚡ Movimiento Más Débil (A trabajar)</span>
+              <strong id="moveWeakText">—</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTONES FINALES: GUARDAR PERFIL EN LA NUBE, DESCARGAR INFORME PDF Y WHATSAPP -->
+      <div class="actions-footer-card">
+        <div class="actions-header">
+          <h3>Guardar Perfil en la Nube y Descargar Informe PDF</h3>
+          <p>Guarda tu perfil en la nube para futuras revisiones y descarga tu informe oficial en PDF para enviárselo por WhatsApp al <strong>Nutriólogo Diego Rodea</strong>.</p>
+        </div>
+
+        <div class="actions-buttons-row">
+          <button type="button" class="btn-action btn-cloud" id="btnSaveCloud">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+              <path d="m12 13 3 3m-3-3-3 3m3-3v6"/>
+            </svg>
+            Guardar Perfil en la Nube
+          </button>
+
+          <button type="button" class="btn-action btn-pdf" id="btnDownloadPdf">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Descargar Informe (PDF)
+          </button>
+
+          <button type="button" class="btn-action btn-whatsapp" id="btnSendWhatsapp">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+            Enviar por WhatsApp
+          </button>
+        </div>
+
+        <div id="statusBanner" class="status-banner hidden" role="status"></div>
+
+        <!-- Historial de Perfiles Guardados y Nube -->
+        <details class="cloud-records-drawer" open>
+          <summary>☁️ Perfiles de Usuarios Guardados (<span id="savedCountBadge">0</span>) y Sincronización en la Nube</summary>
+          <div class="drawer-inner">
+            <div class="webhook-config-row">
+              <label for="cloudWebhookUrl">Conexión opcional a Hoja de Cálculo en la Nube del Nutriólogo (Google Sheets / Webhook):</label>
+              <div class="webhook-input-group">
+                <input type="url" id="cloudWebhookUrl" placeholder="https://script.google.com/macros/s/.../exec" />
+                <button type="button" id="btnSaveWebhook" class="btn-small">Conectar Nube</button>
+              </div>
+              <small>Cada usuario que pulsa "Guardar Perfil en la Nube" recibe un código único de recuperación en la nube y queda registrado automáticamente.</small>
+            </div>
+            <div id="savedRecordsList" class="saved-records-list"></div>
+          </div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>© 2026 <strong>Nutriólogo Diego Rodea</strong> · Sistema de Antropometría, FFMI y Rendimiento Muscular</p>
+    </div>
+  </footer>
+
+  <script src="logo-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
